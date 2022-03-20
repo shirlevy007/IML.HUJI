@@ -1,5 +1,6 @@
 from __future__ import annotations
 import numpy as np
+import math
 from numpy.linalg import inv, det, slogdet
 
 
@@ -13,7 +14,7 @@ class UnivariateGaussian:
 
         Parameters
         ----------
-        biased_var : bool, default=True
+        biased_var : bool, default=False
             Should fitted estimator of variance be a biased or unbiased estimator
 
         Attributes
@@ -51,8 +52,8 @@ class UnivariateGaussian:
         Sets `self.mu_`, `self.var_` attributes according to calculated estimation (where
         estimator is either biased or unbiased). Then sets `self.fitted_` attribute to `True`
         """
-        raise NotImplementedError()
-
+        self.mu_ = np.mean(X)
+        self.var_ = np.var(X)
         self.fitted_ = True
         return self
 
@@ -74,9 +75,14 @@ class UnivariateGaussian:
         ------
         ValueError: In case function was called prior fitting the model
         """
+
         if not self.fitted_:
             raise ValueError("Estimator must first be fitted before calling `pdf` function")
-        raise NotImplementedError()
+        pdf = np.vectorize(self.pdf_helper)
+        return pdf(self.mu_, self.var_, X)
+
+    def pdf_helper(self, mu, var, X):
+        return (1 / math.sqrt(var * 2 * math.pi)) * (math.exp((-((X - mu) ** 2)) / (2 * var)))
 
     @staticmethod
     def log_likelihood(mu: float, sigma: float, X: np.ndarray) -> float:
@@ -97,8 +103,8 @@ class UnivariateGaussian:
         log_likelihood: float
             log-likelihood calculated
         """
-        raise NotImplementedError()
-
+        likelihood = (1/((sigma*2*math.pi)**(len(X)/2)))*(math.exp((-(np.sum((X-mu)**2)))/(2*sigma)))
+        return math.log(likelihood, math.e)
 
 class MultivariateGaussian:
     """
@@ -143,10 +149,11 @@ class MultivariateGaussian:
         Sets `self.mu_`, `self.cov_` attributes according to calculated estimation.
         Then sets `self.fitted_` attribute to `True`
         """
-        raise NotImplementedError()
-
+        self.mu_ = np.mean(X)
+        self.cov_ = np.var(X)
         self.fitted_ = True
         return self
+
 
     def pdf(self, X: np.ndarray):
         """

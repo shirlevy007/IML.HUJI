@@ -52,8 +52,11 @@ class UnivariateGaussian:
         Sets `self.mu_`, `self.var_` attributes according to calculated estimation (where
         estimator is either biased or unbiased). Then sets `self.fitted_` attribute to `True`
         """
-        self.mu_ = np.mean(X)
-        self.var_ = np.var(X)
+        self.mu_ = (1/X.size)*np.sum(X)
+        if self.biased_:
+            self.var_ = ((X.shape[0] - 1) * np.var(X)) /X.shape[0]
+        else:
+            self.var_ = np.var(X)
         self.fitted_ = True
         return self
 
@@ -103,8 +106,8 @@ class UnivariateGaussian:
         log_likelihood: float
             log-likelihood calculated
         """
-        likelihood = (1/((sigma*2*math.pi)**(len(X)/2)))*(math.exp((-(np.sum((X-mu)**2)))/(2*sigma)))
-        return math.log(likelihood, math.e)
+        likelihood = (-X.shape[0]/2)*(math.log(2*sigma*math.pi))-((1/(2*sigma))*(np.sum((X-mu)**2)))
+        return likelihood
 
 class MultivariateGaussian:
     """
@@ -130,6 +133,8 @@ class MultivariateGaussian:
         """
         self.mu_, self.cov_ = None, None
         self.fitted_ = False
+        self.det_ = None
+        self.inv_cov_ = None
 
     def fit(self, X: np.ndarray) -> MultivariateGaussian:
         """
@@ -149,8 +154,8 @@ class MultivariateGaussian:
         Sets `self.mu_`, `self.cov_` attributes according to calculated estimation.
         Then sets `self.fitted_` attribute to `True`
         """
-        self.mu_ = np.mean(X)
-        self.cov_ = np.var(X)
+        self.mu_ = np.mean(X, axis=0) #by column
+        self.cov_ = np.cov(X, rowvar=False)
         self.fitted_ = True
         return self
 

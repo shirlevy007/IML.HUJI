@@ -62,13 +62,16 @@ def test_multivariate_gaussian():
     # print(sample)
 
     # Question 5 - Likelihood evaluation
+    res = {}
     log_likelihood = []
     samples_f1 = np.linspace(-10, 10, 200)
     samples_f3 = np.linspace(-10, 10, 200)
     for f1 in samples_f1:
         row = []
         for f3 in samples_f3:
-            row.append(sample_multi.log_likelihood(np.array([f1, 0, f3, 0]), sample_multi.cov_, sample))
+            log_lh = sample_multi.log_likelihood(np.array([f1, 0, f3, 0]), sample_multi.cov_, sample)
+            row.append(log_lh)
+            res[(f1, f3)] = log_lh
         log_likelihood.append(row)
 
     go.Figure(go.Heatmap(x=samples_f1, y=samples_f3, z=log_likelihood),
@@ -77,6 +80,7 @@ def test_multivariate_gaussian():
                                yaxis_title="r$f3 $")).show()
 
     # Question 6 - Maximum likelihood
+    print("%.3f, %.3f" % max(res, key=res.get))
 
 
 if __name__ == '__main__':

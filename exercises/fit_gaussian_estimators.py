@@ -29,23 +29,18 @@ def test_univariate_gaussian():
               layout=go.Layout(
                   title=r"$\text{Absolute Distance Between The Estimated - And True Value Of The Expectation As Function Of Number Of Samples}$",
                   xaxis_title="$m\\text{ - number of samples}$",
-                  yaxis_title="r$|\hat\mu - \mu|$",
-                  height=300)).show()
-    #
-    #
-    #     # Question 3 - Plotting Empirical PDF of fitted model
+                  yaxis_title="r$|\hat\mu - \mu|$")).show()
+
+    # Question 3 - Plotting Empirical PDF of fitted model
 
     sample_uni_pdf = sample_uni.pdf(sample)
     go.Figure([go.Scatter(x=sample, y=sample_uni_pdf, mode='markers', name=r'$\widehat\mu$')],
               layout=go.Layout(title=r"$\text{PDF Of Samples ~N(10,1)}$",
                                xaxis_title="$\\text{samples}$",
-                               yaxis_title="r$PDF (Density) $",
-                               height=300)).show()
+                               yaxis_title="r$PDF (Density) $")).show()
 
 
-# new_s = np.array([1, 5, 2, 3, 8, -4, -2, 5, 1, 10, -10, 4, 5, 2, 7, 1, 1, 3, 2, -1, -3, 1, -4, 1, 2, 1,
-#               -4, -4, 1, 3, 2, 6, -6, 8, 3, -6, 4, 1, -2, 3, 1, 4, 1, 4, -2, 3, -1, 0, 3, 5, 0, -2])
-# print(UnivariateGaussian().log_likelihood(10, 1, new_s))
+
 
 
 def test_multivariate_gaussian():

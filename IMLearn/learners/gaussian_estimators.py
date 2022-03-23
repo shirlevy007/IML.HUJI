@@ -55,9 +55,9 @@ class UnivariateGaussian:
         """
         self.mu_ = np.mean(X)
         if self.biased_:
-            self.var_ = ((X.shape[0] - 1) * np.var(X)) / X.shape[0]
+            self.var_ = X.var()
         else:
-            self.var_ = np.var(X)
+            self.var_ = X.var(ddof=1)
         self.fitted_ = True
         return self
 

@@ -3,6 +3,7 @@ from typing import NoReturn
 from ...base import BaseEstimator
 import numpy as np
 from numpy.linalg import pinv
+import IMLearn.metrics.loss_functions
 
 
 class LinearRegression(BaseEstimator):
@@ -49,7 +50,17 @@ class LinearRegression(BaseEstimator):
         -----
         Fits model with or without an intercept depending on value of `self.include_intercept_`
         """
-        raise NotImplementedError()
+
+        if self.include_intercept_:
+            X = (1, X)
+        # singular
+        X_inv = pinv(X)
+        if np.linalg.det(X):
+            self.coefs_ = X_inv @ y
+        # non singular
+        else:
+            self.coefs_ = X_inv @ y
+            # self.coefs_ = np.linalg.inv(np.transpose(X) @ X) @ X @ y
 
     def _predict(self, X: np.ndarray) -> np.ndarray:
         """
@@ -65,9 +76,11 @@ class LinearRegression(BaseEstimator):
         responses : ndarray of shape (n_samples, )
             Predicted responses of given samples
         """
-        raise NotImplementedError()
 
-    def _loss(self, X: np.ndarray, y: np.ndarray) -> float:
+        # transpose(X)?###########################
+        return X @ self.coefs_
+
+    def _loss(self, X: np.ndarray, y: np.ndarray, mse_helper=None) -> float:
         """
         Evaluate performance under MSE loss function
 
@@ -84,4 +97,10 @@ class LinearRegression(BaseEstimator):
         loss : float
             Performance under MSE loss function
         """
-        raise NotImplementedError()
+        mse = np.vectorize(self.mse_helper)
+        return (np.sum(self.mse_helper(X))) / len(X)
+
+        def mse_helper(self, X):
+            return IMLearn.metrics.loss_functions.mean_squere_error(X, self.predict(X))
+
+

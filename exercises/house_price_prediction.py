@@ -23,7 +23,22 @@ def load_data(filename: str):
     Design matrix and response vector (prices) - either as a single
     DataFrame or a Tuple[DataFrame, Series]
     """
-    raise NotImplementedError()
+    df = pd.read_csv(filename)
+    df_info = df.loc[:, df.columns != 'id', 'prices', 'long', 'lat', 'date', 'floors', 'zipcode']
+
+    date_dum = pd.get_dummies(df["date"])
+    floors_dum = pd.get_dummies(df["floors"])
+
+    # zip_dum = pd.get_dummies(df["zipcode"])
+    # id_dum = pd.get_dummies(df["id"])
+
+    pd.concat([df_info, date_dum, floors_dum], axis=1)
+
+
+
+
+
+
 
 
 def feature_evaluation(X: pd.DataFrame, y: pd.Series, output_path: str = ".") -> NoReturn:
@@ -43,11 +58,21 @@ def feature_evaluation(X: pd.DataFrame, y: pd.Series, output_path: str = ".") ->
     output_path: str (default ".")
         Path to folder in which plots are saved
     """
-    raise NotImplementedError()
+    pc_temp = []
+    outcome = y["price"].to_numpy()
+    y_std = np.std(outcome)
+    print(y_std)
+    for i in X:
+        col = X[i].to_numpy()
+        cov = np.cov(outcome, col)[0][0]
+        X_std = np.std(col)
+        pc = cov / (X_std*y_std)
+        pc_temp.append(pc)
 
 
 if __name__ == '__main__':
     np.random.seed(0)
+    # load_data(..IML.HUJI/datasets/house_prices.csv)
     # Question 1 - Load and preprocessing of housing prices dataset
     raise NotImplementedError()
 

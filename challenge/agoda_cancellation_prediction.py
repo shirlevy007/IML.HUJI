@@ -1,8 +1,42 @@
+from sklearn.base import BaseEstimator
+
 from challenge.agoda_cancellation_estimator import AgodaCancellationEstimator
 from IMLearn.utils import split_train_test
 
 import numpy as np
 import pandas as pd
+
+
+def cancellacion(c_policy, days_before_cancel, price_per_night, price_total, no_show=False):
+    if (c_policy == "UNKNOWN"):
+        return 0
+    if no_show:
+        days_before_cancel = 0
+    i = 0
+    days = 0
+    payment = 0
+    while (c_policy[i:]):
+        temp = 0
+        while (c_policy[i].isdigit()):
+            temp = temp * 10 + c_policy[i]
+            i += 1
+        if (c_policy[i] == "D"):
+            days = temp
+            i += 1
+            if (days_before_cancel > days):
+                return payment
+        elif (c_policy[i] == "N"):
+            payment = temp * price_per_night
+            i += 1
+        elif (c_policy[i] == "P"):
+            payment = (temp / 100) * price_total
+            i += 1
+        if (len(c_policy)>i):
+            if (c_policy[i] == "_"):
+                i += 1  # the tap "_"
+        else:
+            break
+    return payment
 
 
 def load_data(filename: str):

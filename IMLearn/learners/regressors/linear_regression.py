@@ -3,7 +3,7 @@ from typing import NoReturn
 from ...base import BaseEstimator
 import numpy as np
 from numpy.linalg import pinv
-import IMLearn.metrics.loss_functions
+from IMLearn.metrics.loss_functions import mean_square_error
 
 
 class LinearRegression(BaseEstimator):
@@ -52,15 +52,11 @@ class LinearRegression(BaseEstimator):
         """
 
         if self.include_intercept_:
-            X = (1, X)
-        # singular
+            ones = (np.ones((len(X), 1)), X)
+            X = np.concatenate(ones, axis=1)
         X_inv = pinv(X)
-        if np.linalg.det(X):
-            self.coefs_ = X_inv @ y
-        # non singular
-        else:
-            self.coefs_ = X_inv @ y
-            # self.coefs_ = np.linalg.inv(np.transpose(X) @ X) @ X @ y
+        self.coefs_ = X_inv @ y
+
 
     def _predict(self, X: np.ndarray) -> np.ndarray:
         """
@@ -78,7 +74,13 @@ class LinearRegression(BaseEstimator):
         """
 
         # transpose(X)?###########################
-        return X @ self.coefs_
+        if self.include_intercept_:
+            return (X@self.coefs_[1:]) + self.coefs_[0]
+        else:
+            return X@self.coefs_
+
+
+        # return X @ self.coefs_
 
     def _loss(self, X: np.ndarray, y: np.ndarray, mse_helper=None) -> float:
         """
@@ -97,10 +99,13 @@ class LinearRegression(BaseEstimator):
         loss : float
             Performance under MSE loss function
         """
-        mse = np.vectorize(self.mse_helper)
-        return (np.sum(self.mse_helper(X))) / len(X)
 
-        def mse_helper(self, X):
-            return IMLearn.metrics.loss_functions.mean_squere_error(X, self.predict(X))
+        return mean_square_error(y, self._predict(X))
+
+        # mse = np.vectorize(self.mse_helper)
+        # return (np.sum(self.mse_helper(X))) / len(X)
+        #
+        # def mse_helper(self, X):
+        #     return IMLearn.metrics.loss_functions.mean_squere_error(X, self.predict(X))
 
 

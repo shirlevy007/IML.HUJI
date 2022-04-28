@@ -1,8 +1,13 @@
 from __future__ import annotations
 from typing import Callable
 from typing import NoReturn
+
+import numpy
+
 from ...base import BaseEstimator
 import numpy as np
+
+from ...metrics import misclassification_error
 
 
 def default_callback(fit: Perceptron, x: np.ndarray, y: int):
@@ -33,6 +38,7 @@ class Perceptron(BaseEstimator):
         to be filled in `Perceptron.fit` function.
 
     """
+
     def __init__(self,
                  include_intercept: bool = True,
                  max_iter: int = 1000,
@@ -90,7 +96,19 @@ class Perceptron(BaseEstimator):
         -----
         Fits model with or without an intercept depending on value of `self.fit_intercept_`
         """
-        raise NotImplementedError()
+        if self.include_intercept_:
+            ones = (np.ones((len(X), 1)), X)
+            X = np.concatenate(ones, axis=1)
+        self.coefs_ = numpy.zeros(len(X[0]))
+        self.fitted_ = True
+        for t in range(0, self.max_iter_):
+            for i in range(0, len(y)):
+                if (y[i] * (self.coefs_ @ X[i])) <= 0:
+                    self.coefs_ += y[i] * X[i]
+                    self.callback_(self, X, y)
+                    break
+            else:
+                break
 
     def _predict(self, X: np.ndarray) -> np.ndarray:
         """
@@ -106,7 +124,11 @@ class Perceptron(BaseEstimator):
         responses : ndarray of shape (n_samples, )
             Predicted responses of given samples
         """
-        raise NotImplementedError()
+        if self.include_intercept_:
+            ones = (np.ones((len(X), 1)), X)
+            X = np.concatenate(ones, axis=1)
+        #TODO: make all zeros ones
+        return np.sign(X @ self.coefs_)
 
     def _loss(self, X: np.ndarray, y: np.ndarray) -> float:
         """
@@ -125,4 +147,5 @@ class Perceptron(BaseEstimator):
         loss : float
             Performance under missclassification loss function
         """
-        raise NotImplementedError()
+        y_pred = self._predict(X)
+        return misclassification_error(y, y_pred)

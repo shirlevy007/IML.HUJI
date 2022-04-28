@@ -15,20 +15,27 @@ def cancellacion(c_policy, days_before_cancel, price_per_night, price_total, no_
     i = 0
     days = 0
     payment = 0
+    last_payment = 0
+    ns = 0
     while (c_policy[i:]):
         temp = 0
         while (c_policy[i].isdigit()):
-            temp = temp * 10 + c_policy[i]
+            temp = temp * 10 + int(c_policy[i])
             i += 1
         if (c_policy[i] == "D"):
+            ns += 1
             days = temp
             i += 1
             if (days_before_cancel > days):
                 return payment
         elif (c_policy[i] == "N"):
+            ns -= 1
+            last_payment = payment
             payment = temp * price_per_night
             i += 1
         elif (c_policy[i] == "P"):
+            ns -= 1
+            last_payment = payment
             payment = (temp / 100) * price_total
             i += 1
         if (len(c_policy)>i):
@@ -36,6 +43,10 @@ def cancellacion(c_policy, days_before_cancel, price_per_night, price_total, no_
                 i += 1  # the tap "_"
         else:
             break
+    if no_show:
+        return payment
+    if ns:
+        return last_payment
     return payment
 
 
@@ -89,14 +100,16 @@ def evaluate_and_export(estimator: BaseEstimator, X: np.ndarray, filename: str):
 
 
 if __name__ == '__main__':
-    np.random.seed(0)
+    # np.random.seed(0)
+    #
+    # # Load data
+    # df, cancellation_labels = load_data("../datasets/agoda_cancellation_train.csv")
+    # train_X, train_y, test_X, test_y = split_train_test(df, cancellation_labels)
+    #
+    # # Fit model over data
+    # estimator = AgodaCancellationEstimator().fit(train_X, train_y)
+    #
+    # # Store model predictions over test set
+    # evaluate_and_export(estimator, test_X, "id1_id2_id3.csv")
 
-    # Load data
-    df, cancellation_labels = load_data("../datasets/agoda_cancellation_train.csv")
-    train_X, train_y, test_X, test_y = split_train_test(df, cancellation_labels)
-
-    # Fit model over data
-    estimator = AgodaCancellationEstimator().fit(train_X, train_y)
-
-    # Store model predictions over test set
-    evaluate_and_export(estimator, test_X, "id1_id2_id3.csv")
+    print(cancellacion("130D1N_45D90P_100P", 42, 500, 2000))

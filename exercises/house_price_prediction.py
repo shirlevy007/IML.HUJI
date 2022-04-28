@@ -66,16 +66,7 @@ def preprosses(df):
         limit = 0 if column in POSSIBLE_ZEROS else 1
         df.drop(df[df[column] < limit].index, inplace=True)
     return df
-    # df = pd.get_dummies(df, columns=['zipcode'])
-    # df.drop('zipcode', axis=1, inplace=True)
 
-
-
-
-# def dates_format(row):
-#     date_time = pd.to_datetime(row["date"])
-#     row["date"] = date_time.timestamp()
-#     return row
 
 
 def feature_evaluation(X: pd.DataFrame, y: pd.Series, output_path: str = ".") -> NoReturn:
@@ -95,9 +86,7 @@ def feature_evaluation(X: pd.DataFrame, y: pd.Series, output_path: str = ".") ->
     output_path: str (default ".")
         Path to folder in which plots are saved
     """
-    # pc_temp = []
-    # outcome = y.to_numpy()
-    # outcome = y["price"].to_numpy()
+
     y_std = np.std(y)
     # print(y_std)
     for col in X.columns:
@@ -118,10 +107,7 @@ def feature_evaluation(X: pd.DataFrame, y: pd.Series, output_path: str = ".") ->
                                     showlegend=False)], layout=dict(
             title=r"Correlation Between feature {0} "
                   r"and Prices is {1}".format(col, pc)))
-        # fig.show()
-        # fig.update_xaxes(title=col)
-        # fig.update_yaxes(title="price")
-        # pio.write_image(fig=fig, file=output_path + r"\{}.png".format(col), format='png')
+
         fig.write_image(output_path+"\\"+col+".png")
 
     print("done 2")
@@ -137,7 +123,6 @@ if __name__ == '__main__':
     df, prices = load_data("..\datasets\house_prices.csv")
 
     # Question 2 - Feature evaluation with respect to response
-    # feature_evaluation(df, prices, "../exercises")
     feature_evaluation(df, prices, r"C:\Users\shirl\Documents\plots")
 
     # Question 3 - Split samples into training- and testing sets.
@@ -185,19 +170,4 @@ if __name__ == '__main__':
 
 
 
-    # loss_std = np.array([])
-    # loss_mean = np.array([])
-    # for p in range(10, 101):
-    #     loss = np.array([])
-    #     for i in range(10):
-    #         train_X = train_samples.sample(frac=p / 100)
-    #         train_y = train_response[train_response.index.isin(train_X.index)]
-    #         fit_i = LinearRegression().fit(train_X.to_numpy(), train_y)
-    #         loss_i = fit_i.loss(test_samples.to_numpy(), test_response.to_numpy())
-    #         np.append(loss, loss_i)
-    #     np.append(loss_mean, np.mean(loss))
-    #     np.append(loss_std, np.std(loss))
-    #
-    # loss = np.array(loss)
-    # loss_mean = loss.mean()
-    # print("Loss mean: " + str(loss_mean))
+

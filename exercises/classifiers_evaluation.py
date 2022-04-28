@@ -3,8 +3,15 @@ import numpy as np
 from typing import Tuple
 import plotly.graph_objects as go
 import plotly.io as pio
+import pandas as pd
+import os
+import plotly.express as px
+import IMLearn.learners.classifiers.perceptron
 from plotly.subplots import make_subplots
+
 pio.templates.default = "simple_white"
+
+PATH = "datasets"
 
 
 def load_dataset(filename: str) -> Tuple[np.ndarray, np.ndarray]:
@@ -26,7 +33,13 @@ def load_dataset(filename: str) -> Tuple[np.ndarray, np.ndarray]:
         Class vector specifying for each sample its class
 
     """
-    raise NotImplementedError()
+    print(f'{filename}')
+    dataframe = np.load(filename)
+    # dataframe = dataframe.dropna()
+    # dataframe = dataframe.drop_duplicates()
+    X = dataframe[:, :2]
+    y = dataframe[:, 2]
+    return X, y
 
 
 def run_perceptron():
@@ -36,17 +49,26 @@ def run_perceptron():
     Create a line plot that shows the perceptron algorithm's training loss values (y-axis)
     as a function of the training iterations (x-axis).
     """
-    for n, f in [("Linearly Separable", "linearly_separable.npy"), ("Linearly Inseparable", "linearly_inseparable.npy")]:
+    for n, f in [("Linearly Separable", "linearly_separable.npy"),
+                 ("Linearly Inseparable", "linearly_inseparable.npy")]:
         # Load dataset
-        raise NotImplementedError()
+        X, y = load_dataset(os.path.join(PATH, f))
+
+        losses = []
+
+        def callback(fit: Perceptron, x: np.ndarray, y: int):
+            losses.append(fit.loss(X, y))
+            # print(losses)
 
         # Fit Perceptron and record loss in each fit iteration
-        losses = []
-        raise NotImplementedError()
+        perceptron = Perceptron(callback=callback)
+        perceptron.fit(X, y)
 
         # Plot figure
-        raise NotImplementedError()
-
+        fig = px.line(x=range(len(losses)), y=losses,
+                      title="The perceptron algorithm's training loss values as a function of the training iterations",
+                      labels={"x": "Training iterations", "y": "Training loss values"})
+        fig.show()
 
 def compare_gaussian_classifiers():
     """

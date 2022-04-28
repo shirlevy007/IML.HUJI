@@ -59,9 +59,10 @@ class LDA(BaseEstimator):
         self.classes_, counts = np.unique(y, return_counts=True)  # classes_
         self.pi_ = counts / m
         self.cov_ = np.zeros((len(X[0]), len(X[0])))
+        self.mu_ = np.ndarray((len(self.classes_), len(X[0])))
         for k, class_ in enumerate(self.classes_):
             mu = np.mean(X[y == class_], axis=0)
-            np.append(self.mu_, mu)  # mu_
+            self.mu_[k] = np.array(np.mean(X[y == class_], axis=0))     # mu_
             # TODO: check works np arrays - if not, add regular arrays mu, pi before
             sigma = np.transpose(X[y == class_] - self.mu_[k]) @ (X[y == class_] - self.mu_[k])
             self.cov_ += sigma  # summing all sigmas - devide after loop
@@ -84,7 +85,7 @@ class LDA(BaseEstimator):
             Predicted responses of given samples
         """
 
-        return self.classes_[np.argmax(self.likelihood(X))]
+        return self.classes_[np.argmax(self.likelihood(X), axis=1)]
 
     def likelihood(self, X: np.ndarray) -> np.ndarray:
         """
@@ -104,13 +105,13 @@ class LDA(BaseEstimator):
         if not self.fitted_:
             raise ValueError("Estimator must first be fitted before calling `likelihood` function")
 
-        likelihood = np.ndarray((len(X), len(self.classes_)))
+        likelihood = np.zeros((len(X), len(self.classes_)))
         for i in range(len(X)):
-            cur = np.ndarray((len(X), ))
+            cur = np.zeros((len(self.classes_)))
             for k, class_ in enumerate(self.classes_):
                 a = self._cov_inv @ self.mu_[k]
                 b = np.log(self.pi_[k]) - ((self.mu_[k] @ self._cov_inv @ self.mu_[k]) / 2)
-                cur = np.transpose(a) @ X[i] + b
+                cur[k] = np.transpose(a) @ X[i] + b
             likelihood[i] = cur
         return likelihood
 

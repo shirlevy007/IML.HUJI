@@ -62,8 +62,7 @@ class LDA(BaseEstimator):
         self.mu_ = np.ndarray((len(self.classes_), len(X[0])))
         for k, class_ in enumerate(self.classes_):
             mu = np.mean(X[y == class_], axis=0)
-            self.mu_[k] = np.array(np.mean(X[y == class_], axis=0))     # mu_
-            # TODO: check works np arrays - if not, add regular arrays mu, pi before
+            self.mu_[k] = np.array(mu)     # mu_
             sigma = np.transpose(X[y == class_] - self.mu_[k]) @ (X[y == class_] - self.mu_[k])
             self.cov_ += sigma  # summing all sigmas - devide after loop
         self.cov_ = self.cov_ / (m - len(self.classes_))  # cov

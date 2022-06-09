@@ -131,5 +131,7 @@ class LDA(BaseEstimator):
         loss : float
             Performance under missclassification loss function
         """
+
         y_pred = self._predict(X)
         return misclassification_error(y, y_pred)
+

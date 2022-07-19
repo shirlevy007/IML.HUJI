@@ -78,9 +78,18 @@ def cross_entropy(y_true: np.ndarray, y_pred: np.ndarray) -> float:
     Cross entropy of given predictions
     """
     raise NotImplementedError()
-#
-# if __name__ == '__main__':
-#
-#     y_true = np.array([279000, 432000, 326000, 333000, 437400, 555950])
-#     y_pred = np.array([199000.37562541, 452589.25533196, 333000, 333000, 563867.1347574, 395102.94362135])
-#     print(misclassification_error(y_pred, y_true))
+
+def softmax(X: np.ndarray) -> np.ndarray:
+    """
+    Compute the Softmax function for each sample in given data
+
+    Parameters:
+    -----------
+    X: ndarray of shape (n_samples, n_features)
+
+    Returns:
+    --------
+    output: ndarray of shape (n_samples, n_features)
+        Softmax(x) for every sample x in given data X
+    """
+    raise NotImplementedError()

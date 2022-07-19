@@ -31,10 +31,30 @@ def cross_validate(estimator: BaseEstimator, X: np.ndarray, y: np.ndarray,
 
     Returns
     -------
-    train_score: float
+    train_scores: float
         Average train score over folds
 
     validation_score: float
         Average validation score over folds
     """
-    raise NotImplementedError()
+
+    train_scores, val_scores = [], []
+    partitions = np.mod(np.arange(len(X)), cv)
+    # X_folds = np.array_split(X, cv)
+    # y_folds = np.arraay_split(y, cv)
+    for i in range(cv):
+        X_val, y_val = X[partitions == i], y[partitions == i] #choose different cal each time
+        X_train, y_train = X[partitions != i], y[partitions != i] #all the rest := train
+
+        estimator.fit(X_train, y_train)
+        y_pred_train = estimator.predict(X_train)
+        y_pred_val = estimator.predict(X_val)
+
+        t_score = scoring(y_train, y_pred_train)
+        train_scores.append(t_score)
+        v_score = scoring(y_val, y_pred_val)
+        val_scores.append(v_score)
+
+    return np.average(train_scores), np.average(val_scores)
+
+
